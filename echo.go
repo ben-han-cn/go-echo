@@ -11,12 +11,19 @@ import (
 )
 
 func main() {
-	var addr string
+	var (
+		addr        string
+		workerCount int
+	)
+
 	flag.StringVar(&addr, "addr", "127.0.0.1:53", "address to listen")
+	flag.IntVar(&workerCount, "worker-count", 0, "how many thread to do echo")
 	flag.Parse()
 
-	recevie_count := runtime.NumCPU()
-	for i := 0; i < recevie_count; i++ {
+	if workerCount == 0 {
+		workerCount = runtime.NumCPU()
+	}
+	for i := 0; i < workerCount; i++ {
 		conn, err := reuseport.ListenPacket("udp", addr)
 		if err != nil {
 			log.Fatalf("invalid addr:%s", err.Error())
